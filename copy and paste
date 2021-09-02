@@ -1,0 +1,47 @@
+Sub copypaste()
+ 
+'Display a Dialog Box that allows to select a single file.
+'The path for the file picked will be stored in fullpath variable
+  With Application.FileDialog(msoFileDialogFilePicker)
+        'Makes sure the user can select only one file
+        .AllowMultiSelect = False
+        'Filter to just the following types of files to narrow down selection options
+        .Filters.Add "Excel Files", "*.xlsx; *.xlsm; *.xls; *.csv; *.xlsb", 1
+        'Show the dialog box
+        .Show
+        
+        'Store in fullpath variable
+        fullpath = .SelectedItems.Item(1)
+    End With
+    
+    'It's a good idea to still check if the file type selected is accurate.
+    'Quit the procedure if the user didn't select the type of file we need.
+    If InStr(fullpath, ".xls") = 0 Then
+        Exit Sub
+    End If
+    
+    
+  Dim fDialog As FileDialog
+  Set fDialog = Application.FileDialog(msoFileDialogFilePicker)
+    With fDialog
+        .AllowMultiSelect = True
+        .Title = "Please select the files"
+        .Filters.Clear
+        .Filters.Add "CSV Files", "*.csv"
+        .Filters.Add "Excel Files", "*.xlsx; *.xlsm; *.xls; *.xlsb", 1
+
+        If .Show = True Then
+            Dim wb As Workbook, fpath As Variant
+            For Each fpath In .SelectedItems
+             Set wb = Workbooks.Open(fullpath)
+             Set wbb = Workbooks.Open(fpath)
+             wb.Sheets("sheet1").Range("A1:A4").copy 'changing the "sheet1" into actual sheet name in the copy source and change the range of copy source
+             wbb.Sheets("sheet1").Range("B1").PasteSpecial xlPasteValues 'changing the "sheet1" into actual sheet name in the target file
+             
+             wb.Sheets("sheet1").Range("A5:A8").copy 'changing the "sheet1" into actual sheet name in the copy source and change the range of copy source
+             wbb.Sheets("sheet1").Range("A1").PasteSpecial xlPasteValues 'changing the "sheet1" into actual sheet name in the target file
+            Next
+        End If
+    End With
+End Sub
+
